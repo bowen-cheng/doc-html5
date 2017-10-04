@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video</title>
+</head>
+<body>
+<main>
+  <video id="vid" poster="img/kitchen.png" width="700">
+    <source src="media/kitchen.mp4" type="video/mp4">
+    <source src="media/kitchen.webm" type="video/webm">
+  </video>
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-1">
+      <input type="range"
+             id="scrubber"
+             min="0"
+             max="14"
+             value="0"
+             step="1">
+    </div>
+    <div class="col-sm-2">
+      <span id="remainingTime">0:00</span> /
+      <span id="totalTime">0:00</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-8 text-center">
+      <button class="btn btn-sm" id="playPause">Play</button>
+      <span class="divider">|</span>
+      <button class="btn btn-sm" id="begin">&lt;&lt;</button>
+      <button class="btn btn-sm" id="rewind">&lt;</button>
+      <button class="btn btn-sm" id="fastForward">&gt;</button>
+      <button class="btn btn-sm" id="end">&gt;&gt;</button>
+      <span class="divider">|</span>
+      <button class="btn btn-sm" id="stop">Stop</button>
+    </div>
+  </div>
+  <div class="row push-down-top">
+    <div class="col-sm-3 col-sm-offset-1">
+      <div class="row">
+        <div class="col-sm-8">
+          <input type="range"
+                 id="volume"
+                 min="0"
+                 step="0.1"
+                 max="1"
+                 title="Volume">
+        </div>
+        <div class="col-sm-1">
+          <button class="btn btn-xs" id="mute">Mute</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3 col-sm-offset-1">
+      <div class="row">
+        <div class="col-sm-2">Speed</div>
+        <div class="col-sm-10">
+          <input type="range"
+                 id="playbackRate"
+                 min="1"
+                 value="1"
+                 step="1"
+                 max="4"
+                 title="Playback Speed">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var video = document.getElementById('vid');
+    var remainingTime = document.getElementById('remainingTime');
+    var totalTime = document.getElementById('totalTime');
+    var playPause = document.getElementById('playPause');
+    var stop = document.getElementById('stop');
+    var rewind = document.getElementById('rewind');
+    var begin = document.getElementById('begin');
+    var end = document.getElementById('end');
+    var fastForward = document.getElementById('fastForward');
+    var volume = document.getElementById('volume');
+    var mute = document.getElementById('mute');
+    var scrubber = document.getElementById('scrubber');
+    var playbackRate = document.getElementById('playbackRate');
+
+    var TIME_STEP = 5;
+    var vol = 0;
+
+    var formatTime = function (seconds) {
+      seconds = Math.round(seconds);
+      var minutes = 0;
+      if (seconds >= 60) {
+        minutes = Math.floor(seconds / 60);
+        seconds = (seconds - (minutes * 60));
+      }
+
+      seconds = seconds + '';
+      if (seconds.length === 1) {
+        seconds = '0' + seconds;
+      }
+
+      return minutes + ':' + seconds;
+    };
+
+    var playOrPauseVideo = function () {
+      if (video.paused || video.ended) {
+        video.play();
+        playPause.innerText = 'Pause';
+      }
+      else {
+        video.pause();
+        playPause.innerText = 'Play';
+      }
+    };
+
+    video.addEventListener('click', playOrPauseVideo, false);
+    playPause.addEventListener('click', playOrPauseVideo, false);
+
+    stop.addEventListener('click', function () {
+      video.pause();
+      video.currentTime = 0;
+      playPause.innerText = 'Play';
+      video.playbackRate = 1;
+      playbackRate.value = 1;
+    }, false);
+
+    begin.addEventListener('click', function () {
+      video.currentTime = 0;
+    }, false);
+
+    rewind.addEventListener('click', function () {
+      video.currentTime -= TIME_STEP;
+    }, false);
+
+    fastForward.addEventListener('click', function () {
+      video.currentTime += TIME_STEP;
+    }, false);
+
+    end.addEventListener('click', function () {
+      video.currentTime = video.duration;
+      playPause.innerText = 'Play';
+    }, false);
+
+    volume.addEventListener('change', function () {
+      video.volume = this.value;
+    }, false);
+
+    mute.addEventListener('click', function () {
+
+      if (!video.muted) {
+        vol = volume.value;
+      }
+
+      video.muted = !video.muted;
+
+      if (video.muted) {
+        volume.value = 0;
+        mute.innerText = 'Unmute';
+      }
+      else {
+        volume.value = vol;
+        mute.innerText = 'Mute';
+      }
+    }, false);
+
+    scrubber.addEventListener('change', function () {
+      video.currentTime = this.value;
+    }, false);
+
+    playbackRate.addEventListener('change', function () {
+      video.playbackRate = this.value;
+    }, false);
+
+    video.addEventListener('play', function () {
+      totalTime.innerText = formatTime(video.duration);
+    });
+
+    video.addEventListener('timeupdate', function () {
+      remainingTime.innerText = formatTime(video.currentTime);
+      scrubber.value = video.currentTime;
+    }, false);
+
+  </script>
+</main>
+</body>
+</html>
