@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thumbnail</title>
+</head>
+<body>
+<main>
+  <div id="player">
+    <video id="vid" controls="" width="320" height="180">
+      <source src="../5-media/media/kitchen.mp4" type="video/mp4">
+      <source src="../5-media/media/kitchen.webm" type="video/webm">
+    </video>
+  </div>
+  <button id="btn">Get Thumbnail</button>
+  <div id="thumbs"></div>
+  <canvas id="canvas" width="320" height="180">
+    <p>Your browser does not support the canvas element.</p>
+  </canvas>
+</main>
+<script>
+  var video = document.querySelector('#vid');
+  var canvas = document.querySelector('#canvas');
+  var context = null;
+  var btn = document.querySelector('#btn');
+  var thumbs = document.querySelector('#thumbs');
+
+  if (canvas && canvas.getContext) {
+    context = canvas.getContext('2d');
+
+    var width = 320;
+    video.width = width;
+    canvas.width = width;
+    video.offsetWidth = width;
+
+    var height = 180;
+    video.height = height;
+    canvas.height = height;
+    video.offsetHeight = height;
+
+    var getThumb = function () {
+      var thumb;
+      context.drawImage(video, 0, 0, width, height);
+      thumb = new Image();
+      thumb.src = canvas.toDataURL('image/png');
+      thumb.width = 60;
+      thumbs.appendChild(thumb);
+    };
+
+    btn.addEventListener('click', getThumb);
+  }
+</script>
+</body>
+</html>
